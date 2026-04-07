@@ -48,7 +48,6 @@ import { PreRenderer } from './PreRenderer.js'
 import { Options } from './Options.js'
 import gsap from 'gsap'
 import { Map } from './Map.js'
-import { Easter } from './Easter.js'
 
 export class Game
 {
@@ -199,7 +198,6 @@ export class Game
         // this.monitoring = new Monitoring()
         this.world.step(1)
         this.overlay = new Overlay()
-        this.easter = new Easter()
 
         // Pre-render if quality high
         if(this.quality.level === 0 && this.rendering.renderer.backend.isWebGPUBackend)
