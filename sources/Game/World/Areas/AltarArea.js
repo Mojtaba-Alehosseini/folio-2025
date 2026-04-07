@@ -134,6 +134,7 @@ export class AltarArea extends Area
         bottomMaterial.outputNode = Fn(() =>
         {
             const newUv = uv().sub(0.5).mul(1.7).add(0.5)
+            newUv.y.assign(newUv.y.oneMinus())
             const satanStar = texture(satanStarTexture, newUv).r
 
             const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color) // Fog

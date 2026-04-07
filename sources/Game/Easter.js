@@ -1,8 +1,4 @@
-import * as THREE from 'three/webgpu'
 import { Game } from './Game.js'
-import { InstancedGroup } from './InstancedGroup.js'
-import { cameraPosition, color, Fn, luminance, mix, normalWorld, positionWorld, uniform, uv, vec3, vec4 } from 'three/tsl'
-import gsap from 'gsap'
 
 export class Easter
 {
@@ -10,269 +6,164 @@ export class Easter
     {
         this.game = Game.getInstance()
 
-        this.code = 'easter2025'
-        
-        this.setEggVisual()
-        this.setEggs()
-        this.setModal()
-
-        this.game.ticker.events.on('tick', () =>
-        {
-            this.update()
-        }, 10)
+        this.setMenu()
+        this.setData()
     }
 
-    setEggVisual()
+    setMenu()
     {
-        const colorA = uniform(color('#ff8641'))
-        const colorB = uniform(color('#ff3e00'))
-        const intensity = uniform(5)
+        this.menu = {}
+        this.menu.instance = this.game.menu.items.get('easter')
+        this.menu.needsUpdate = false
+        this.menu.eggsElement = this.menu.instance.contentElement.querySelector('.js-eggs')
+        this.menu.eggs = {}
 
-        /**
-         * Egg
-         */
-        // Material
-        const eggMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true })
-
-        eggMaterial.outputNode = Fn(() =>
+        this.menu.instance.events.on('open', () =>
         {
-            const viewDirection = positionWorld.sub(cameraPosition).normalize()
-                
-            const fresnel = viewDirection.dot(normalWorld).abs().oneMinus()
+            if(this.menu.needsUpdate)
+                this.menu.updateEggs(this.menu.needsUpdate)
+        })
 
-            const mixedColor = mix(colorB, colorA, fresnel)
-
-            return vec4(vec3(mixedColor.mul(intensity)), 1)
-        })()
-
-        // Mesh
-        const egg = this.game.resources.easterEggVisualModel.scene.getObjectByName('egg')
-        egg.position.set(0, 0, 0)
-        egg.frustumCulled = false
-        egg.material = eggMaterial
-        
-        /**
-         * Beams
-         */
-        // Material
-        const beamsMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true })
-
-        beamsMaterial.outputNode = Fn(() =>
+        this.menu.updateEggs = (eggsData = null) =>
         {
-            const strength = uv().y.add(this.game.ticker.elapsedScaledUniform.mul(0.05)).fract()
-
-            strength.greaterThan(0.2).discard()
-
-            const mixStrength = strength.mul(5)
-            const mixedColor = mix(colorA, colorB, mixStrength)
-
-            return vec4(vec3(mixedColor.mul(intensity)), 1)
-
-            return vec4(vec3(mixedColor.mul(intensity)), 1)
-        })()
-
-        // Mesh
-        const beams = this.game.resources.easterEggVisualModel.scene.getObjectByName('beams')
-        beams.position.set(0, 0, 0)
-        beams.frustumCulled = false
-        beams.material = beamsMaterial
-        
-        this.visual = this.game.resources.easterEggVisualModel.scene
-    }
-    
-    setEggs()
-    {
-        this.eggs = {}
-        this.eggs.allCaught = false
-        this.eggs.catchDistance = 2
-        this.eggs.closest = null
-
-        // References
-        const references = InstancedGroup.getReferencesFromChildren(this.game.resources.easterEggReferencesModel.scene.children)
-        
-        // Items
-        this.eggs.items = []
-        for(const reference of references)
-        {
-            const item = {}
-            item.reference = reference
-            item.distance = Infinity
-            item.caught = false
-            // item.element = this.eggs.fragmentElements[i]
-
-            item.catch = () =>
+            if(!this.menu.instance.isOpen)
             {
-                item.caught = true
-                gsap.to(
-                    item.reference.scale,
-                    {
-                        x: 0.1,
-                        y: 0.1,
-                        z: 0.1,
-                        duration: 0.6,
-                        ease: 'back.in(6)',
-                        onComplete: () =>
-                        {
-                            item.reference.position.y = 99
-                        }
-                    }
-                )
+                this.menu.needsUpdate = eggsData
             }
 
-            this.eggs.items.push(item)
-        }
-
-        // Instanced group
-        this.instancedGroup = new InstancedGroup(references, this.visual)
-
-        this.eggs.getClosest = () =>
-        {
-            let closest = null
-            let minDistance = Infinity
-            for(const egg of this.eggs.items)
+            // Menu open => Update content
+            else
             {
-                if(!egg.caught)
+                for(const eggDataKey in eggsData)
                 {
-                    egg.distance = egg.reference.position.distanceTo(this.game.player.position)
+                    const eggData = eggsData[eggDataKey]
+                    let egg = this.menu.eggs[eggDataKey]
 
-                    if(closest === null || egg.distance < minDistance)
+                    // Create
+                    if(typeof egg === 'undefined')
                     {
-                        closest = egg
-                        minDistance = egg.distance
+                        const html = /* html */`
+                            <div class="top">
+                                <div class="js-discount title discount"></div>
+                                <div class="js-description description"></div>
+                                <div class="uses">Used <span class="js-uses-current current"></span>/<span class="js-uses-total total"></span></div>
+                            </div>
+                            <div class="bar">
+                                <div class="fill js-bar-fill"></div>
+                            </div>
+                        `
+
+                        const element = document.createElement('div')
+                        element.classList.add('egg')
+                        element.innerHTML = html
+
+                        this.menu.eggsElement.append(element)
+
+                        egg = {
+                            element: element,
+                            discountElement: element.querySelector('.js-discount'),
+                            descriptionElement: element.querySelector('.js-description'),
+                            usesCurrentElement: element.querySelector('.js-uses-current'),
+                            usesTotalElement: element.querySelector('.js-uses-total'),
+                            barFillElement: element.querySelector('.js-bar-fill'),
+                        }
+
+                        this.menu.eggs[eggDataKey] = egg
                     }
+
+                    // Update
+                    egg.discountElement.innerHTML = eggData.discount
+                    egg.usesCurrentElement.innerHTML = eggData.uses
+                    egg.usesTotalElement.innerHTML = eggData.max_uses
+
+                    if(eggData.uses >= eggData.max_uses)
+                    {
+                        egg.descriptionElement.innerHTML = eggData.description ? eggData.description : '...'
+                        egg.element.classList.add('is-used')
+                    }
+                    else
+                    {
+                        egg.descriptionElement.innerHTML = '...'
+                        egg.element.classList.remove('is-used')
+                    }
+
+                    const scale = eggData.uses / eggData.max_uses
+                    egg.barFillElement.style.transform = `scaleX(${scale})`
                 }
-            }
 
-            return closest
-        }
-
-        this.eggs.tryCatch = (egg) =>
-        {
-            if(egg.distance < this.eggs.catchDistance && !egg.caught)
-                this.eggs.catch(egg)
-        }
-
-        this.eggs.catch = (egg) =>
-        {
-            egg.catch()
-            this.eggs.updateTitle()
-            const isOver = this.eggs.testOver()
-
-            this.game.audio.sounds.ding.volume(isOver ? 0.5 : 0.2)
-            this.game.audio.sounds.ding.play()
-            this.game.audio.sounds.swoosh.play()
-        }
-
-        this.eggs.updateTitle = () =>
-        {
-            let title = ''
-            this.eggs.items.forEach(item =>
-            {
-                title += item.caught ? '🐣' : '🥚'
-            })
-            document.title = title
-        }
-
-        this.eggs.testOver = () =>
-        {
-            this.eggs.allCaught = this.eggs.items.reduce((accumulator, fragment) => { return fragment.caught && accumulator }, true)
-
-            if(this.eggs.allCaught)
-            {
-                this.game.menu.open('easter-end')
-
-                return true
-            }
-            else
-            {
-                return false
-            }
-        }
-    }
-
-    setModal()
-    {
-        this.modal = {}
-
-        const endModal = this.game.modals.items.get('easter-end')
-        const introModal = this.game.modals.items.get('intro')
-        this.modal.element = endModal.element
-        this.modal.time = this.modal.element.querySelector('.js-time')
-        this.modal.code = this.modal.element.querySelector('.js-code')
-        this.modal.link = this.modal.element.querySelector('.js-link')
-        this.modal.firstOpen = true
-
-        let timeStart = null
-
-        introModal.events.on('close', () =>
-        {
-            timeStart = this.game.ticker.elapsed
-        })
-        
-        endModal.events.on('open', () =>
-        {
-            if(this.modal.firstOpen)
-            {
-                // Time
-                let elapsed = this.game.ticker.elapsed - timeStart
-                const hours = Math.floor(elapsed / 60 / 60)
-
-                elapsed -= hours * 60 * 60
-                const minutes = Math.floor(elapsed / 60)
-
-                elapsed -= minutes * 60
-                const seconds = Math.floor(elapsed)
+                // let html = ''
+                // let rank = 1
                 
-                const textParts = []
+                // for(const score of scores)
+                // {
+                //     let flag = ''
+                //     const country = this.menu.inputFlag.countries.get(score[1])
 
-                if(hours)
-                    textParts.push(`${hours} hour${hours > 1 ? 's' : ''}`)
+                //     if(country)
+                //         flag = /* html */`<img width="27" height="18" src="${country.imageUrl}" loading="lazy">`
 
-                if(hours || minutes)
-                    textParts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`)
+                //     html += /* html */`
+                //         <tr>
+                //             <td>${rank}</td>
+                //             <td>${flag}</td>
+                //             <td>${score[0]}</td>
+                //             <td>${timeToRaceString(score[2] / 1000)}</td>
+                //         </tr>
+                //     `
 
-                if(hours || minutes || seconds)
-                    textParts.push(`${seconds} second${seconds > 1 ? 's' : ''}`)
+                //     rank++
+                // }
 
-                const text = textParts.join(' ')
-                this.modal.time.textContent = text
+                // this.menu.leaderboardElement.innerHTML = html
 
-                // Code
-                if(this.modal.code)
-                    this.modal.code.textContent = this.code.toUpperCase()
 
-                // Link
-                this.modal.link.href = `https://threejs-journey.com/join/${this.code}`
+                // <div class="egg is-used">
+                //     <div class="top">
+                //         <div class="title discount">30%</div>
+                //         <div class="description">In the sky</div>
+                //         <div class="uses">Used <span class="current">X</span>/<span class="total">X</span></div>
+                //     </div>
+                //     <div class="bar">
+                //         <div class="fill"></div>
+                //     </div>
+                // </div>
 
-                // Save as already opened
-                this.modal.firstOpen = false
+                this.menu.needsUpdate = false
             }
-        })
+        }
     }
 
-    update()
+    setData()
     {
-        this.eggs.closest = this.eggs.getClosest()
-
-        if(this.eggs.closest)
+        // Server message event
+        this.game.server.events.on('message', (data) =>
         {
-            this.eggs.tryCatch(this.eggs.closest)
-        }
-
-
-        if(this.game.world.visualVehicle.antenna)
-        {
-            if(this.eggs.closest)
+            // Init and insert
+            if(data.type === 'init')
             {
-                this.game.world.visualVehicle.antenna.target.copy(this.eggs.closest.reference.position)
+                this.menu.updateEggs(data.easterEggs)
             }
-            else
+            else if(data.type === 'easterUpdate')
             {
-                const forwardTarget = this.game.vehicle.position.clone().add(this.game.vehicle.forward.clone().multiplyScalar(35))
-                forwardTarget.y += 1
-                this.game.vehicle.antenna.target.copy(forwardTarget)
+                this.menu.updateEggs(data.easterEggs)
             }
-        }
+        })
+
+        // // Server disconnected
+        // this.game.server.events.on('disconnected', () =>
+        // {
+        //     this.resetTime.deactivate()
+        //     this.leaderboard.update(null)
+        //     this.menu.updateLeaderboard(null)
+        // })
+
+        // // Message already received
+        // if(this.game.server.initData)
+        // {
+        //     this.resetTime.activate(this.game.server.initData.circuitResetTime)
+        //     this.leaderboard.update(this.game.server.initData.circuitLeaderboard)
+        //     this.menu.updateLeaderboard(this.game.server.initData.circuitLeaderboard)
+        // }
     }
 }
 

@@ -78,6 +78,10 @@ const text = `
 ║ Amatic SC (Fonts)         ⇒ https://fonts.google.com/specimen/Amatic+SC
 ║ Nunito (Fonts).           ⇒ https://fonts.google.com/specimen/Nunito?query=Nunito
 ╚═══════════════════════╝
+
+╔═ Happy Easter ════════╗
+║ B8EC2720
+╚═══════════════════════╝
 `
 let finalText = ''
 let finalStyles = []

@@ -25,7 +25,6 @@ export class Menu
         this.setClose()
         this.setItems()
         this.setGamepad()
-        this.preopen()
         
         this.element.addEventListener('transitionend', () =>
         {
@@ -274,9 +273,6 @@ export class Menu
 
     preopen()
     {
-        if(this.game.debug.active)
-            return
-
         this.items.forEach((item) => 
         {
             // Is preopened
