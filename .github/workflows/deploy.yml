@@ -37,6 +37,11 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_COMPRESSED: 1
+          VITE_LOG: 1
+          VITE_WHISPERS_COUNT: 30
+          VITE_MUSIC: 1
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
