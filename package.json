@@ -1,5 +1,5 @@
 {
-  "name": "bruno-simon-folio-2025",
+  "name": "mojtaba-alehosseini-spatial-folio",
   "version": "0.0.0",
   "main": "index.js",
   "type": "module",
@@ -9,9 +9,9 @@
     "preview": "vite preview",
     "compress": "node scripts/compress.js static/"
   },
-  "author": "",
+  "author": "Mojtaba Alehosseini",
   "license": "ISC",
-  "description": "",
+  "description": "A spatial portfolio for Mojtaba Alehosseini, forked from brunosimon/folio-2025.",
   "dependencies": {
     "@dimforge/rapier3d": "^0.17.3",
     "@gltf-transform/cli": "^4.1.0",

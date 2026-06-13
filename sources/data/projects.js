@@ -1,14 +1,14 @@
 export default [
     {
-        title: 'Three.js Journey',
-        titleSmall: [ 'Three.js', 'Journey' ],
-        url: 'https://threejs-journey.com',
+        title: 'Hand Frame Effects',
+        titleSmall: [ 'Hand Frame', 'Effects' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/hand-frame-effects',
         attributes:
         {
-            role: [ 'developer', 'formater' ],
-            with: [ 'Hervé Studio', 'Bonhomme Paris' ]
+            role: [ 'computer vision', 'interactive UI' ],
+            with: 'Python'
         },
-        distinctions: [ 'fwa' ], // 'awwwards', 'fwa', 'cssda'
+        distinctions: [],
         images:
         [
             'threejs-journey-1.ktx',
@@ -18,34 +18,16 @@ export default [
             'threejs-journey-5.ktx',
         ]
     },
-    // {
-    //     title: 'Chartogne Taillet',
-    //     titleSmall: [ 'Chartogne', 'Taillet' ],
-    //     url: 'https://chartogne-taillet.com',
-    //     attributes:
-    //     {
-    //         at: 'Immersive Garden',
-    //         role: 'WebGL developer',
-    //         with: 'Rémi Tran'
-    //     },
-    //     distinctions: [ 'awwwards', 'cssda', 'fwa' ], // 'awwwards', 'fwa', 'cssda'
-    //     images:
-    //     [
-    //         'chartogne-taillet-1.ktx',
-    //         'chartogne-taillet-2.ktx',
-    //         'chartogne-taillet-3.ktx',
-    //     ]
-    // },
     {
-        title: 'Bonhomme | 10 ans',
-        titleSmall: [ 'Bonhomme', '10 ans' ],
-        url: 'https://anniversary.bonhommeparis.com',
+        title: 'Change Detection Blob Matching',
+        titleSmall: [ 'Blob', 'Matching' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/Change-Detection-Blob-Matching',
         attributes:
         {
-            role: 'WebGL developer',
-            with: 'Bonhomme Paris'
+            role: [ 'computer vision', 'tracking' ],
+            with: 'OpenCV'
         },
-        distinctions: [ 'awwwards', 'fwa' ],
+        distinctions: [],
         images:
         [
             'bonhomme-10-ans-1.ktx',
@@ -54,16 +36,15 @@ export default [
         ]
     },
     {
-        title: 'Madbox',
-        titleSmall: [ 'Madbox' ],
-        url: 'https://madbox.io',
+        title: 'Marketplace Optimisation',
+        titleSmall: [ 'Marketplace', 'Optimisation' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/marketplace-optimisation',
         attributes:
         {
-            role: 'WebGL developer',
-            at: 'Hervé Studio',
-            with: 'Lei Xing'
+            role: [ 'optimization', 'analytics' ],
+            with: 'Python'
         },
-        distinctions: [ 'awwwards' ],
+        distinctions: [],
         images:
         [
             'madbox-1.ktx',
@@ -72,16 +53,15 @@ export default [
         ]
     },
     {
-        title: 'Luni',
-        titleSmall: [ 'Luni' ],
-        url: 'https://www.luni.app',
+        title: 'GPU Cost Energy Dashboard',
+        titleSmall: [ 'GPU Cost', 'Dashboard' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/gpu-cost-energy-dashboard',
         attributes:
         {
-            role: 'WebGL developer',
-            at: 'Hervé Studio',
-            with: 'Loïc Belaidremesal'
+            role: [ 'dashboard', 'cost analysis' ],
+            with: 'Power BI'
         },
-        distinctions: [ 'awwwards', 'fwa' ],
+        distinctions: [],
         images:
         [
             'luni-1.ktx',
@@ -91,15 +71,15 @@ export default [
         ]
     },
     {
-        title: 'Scout',
-        titleSmall: [ 'Scout' ],
-        url: 'https://scout-omega.vercel.app',
+        title: 'MLOps Pipeline',
+        titleSmall: [ 'MLOps', 'Pipeline' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/mlops-pipeline',
         attributes:
         {
-            role: 'WebGL developer',
-            at: 'Hervé Studio'
+            role: [ 'machine learning', 'delivery' ],
+            with: 'Python'
         },
-        distinctions: [  ],
+        distinctions: [],
         images:
         [
             'scout-1.ktx',
@@ -108,15 +88,15 @@ export default [
         ]
     },
     {
-        title: 'Prior Holdings',
-        titleSmall: [ 'Prio', 'Holdings' ],
-        url: 'https://prior.co.jp/discover/en',
+        title: 'Pneumonia X-ray Transfer Learning',
+        titleSmall: [ 'X-ray', 'Transfer' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/Pneumonia_X_ray_transfer_learning',
         attributes:
         {
-            role: [ 'Front developer', 'WebGL developer' ],
-            at: 'Immersive Garden'
+            role: [ 'deep learning', 'medical imaging' ],
+            with: 'PyTorch'
         },
-        distinctions: [ 'awwwards', 'cssda', 'fwa' ],
+        distinctions: [],
         images:
         [
             'prior-1.ktx',
@@ -125,15 +105,15 @@ export default [
         ]
     },
     {
-        title: 'Orano',
-        titleSmall:  'Orano',
-        url: 'https://www.orano.group/experience/innovation/en',
+        title: 'Genetic Algorithm',
+        titleSmall: [ 'Genetic', 'Algorithm' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/Genetic-Algorithm',
         attributes:
         {
-            role: [ 'Front developer', 'WebGL developer' ],
-            at: 'Immersive Garden'
+            role: [ 'optimization', 'algorithms' ],
+            with: 'Python'
         },
-        distinctions: [ 'awwwards', 'cssda', 'fwa' ],
+        distinctions: [],
         images:
         [
             'orano-1.ktx',
@@ -142,16 +122,15 @@ export default [
         ]
     },
     {
-        title: 'Citrix / Redbull',
-        titleSmall: ['Citrix', 'Redbull'],
-        url: 'https://thenewmobileworkforce.imm-g-prod.com',
+        title: 'Dump Truck Problem',
+        titleSmall: [ 'Dump Truck', 'Problem' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/The-Dump-Truck-Problem',
         attributes:
         {
-            role: [ 'WebGL developer' ],
-            at: 'Immersive Garden',
-            with: [ 'Damien Doussaud', 'Quentin Leclercq' ]
+            role: [ 'simulation', 'operations research' ],
+            with: 'Python'
         },
-        distinctions: [ 'awwwards', 'cssda', 'fwa' ],
+        distinctions: [],
         images:
         [
             'citrix-redbull-1.ktx',

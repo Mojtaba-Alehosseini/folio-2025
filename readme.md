@@ -1,4 +1,20 @@
-# Folio 2025
+# Mojtaba Alehosseini Spatial Folio
+
+Personalized fork of [brunosimon/folio-2025](https://github.com/brunosimon/folio-2025), adapted for Mojtaba Alehosseini's AI, machine learning, computer vision, dashboard, and model-to-product work.
+
+## Personalization
+
+- Updated public metadata, browser title, app manifest, home copy, social links, and console easter egg.
+- Replaced the project board with public Mojtaba GitHub repositories.
+- Removed the inherited Google Analytics snippet.
+- Preserved the original spatial Three.js/WebGPU world, assets, controls, and attribution.
+
+## Profile Links
+
+- Site: <https://mojtaba-alehosseini.github.io/>
+- GitHub: <https://github.com/Mojtaba-Alehosseini>
+- LinkedIn: <https://www.linkedin.com/in/mojtaba-alehosseini/>
+- Email: <alehoseini.mojtaba@gmail.com>
 
 ![image info](./static/social/share-image.png)
 
