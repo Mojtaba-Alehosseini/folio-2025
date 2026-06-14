@@ -25,14 +25,78 @@ export class LandingArea extends Area
     {
         const references = this.references.items.get('letters')
 
-        for(const reference of references)
-        {
+        if (!references || references.length < 10) return
+
+        // 1. Get original positions of first and last letters to compute center and direction
+        const pos_0 = references[0].position.clone()
+        const pos_9 = references[9].position.clone()
+        const center = new THREE.Vector3().addVectors(pos_0, pos_9).multiplyScalar(0.5)
+        const dir = new THREE.Vector3().subVectors(pos_9, pos_0).normalize()
+        
+        // 2. Define the letter layout for "MOJI"
+        // Original index mappings: 7 = M, 4 = O, 2 = U (to be morphed into J), 6 = I
+        const targetLetters = [
+            { index: 7, offset: -1.35 }, // M
+            { index: 4, offset: -0.45 }, // O
+            { index: 2, offset: 0.45, isJ: true },  // J (morphed from U)
+            { index: 6, offset: 1.25 }  // I
+        ]
+
+        const spacing = 1.35
+
+        // 3. Position and morph the letters we want to keep
+        for (const item of targetLetters) {
+            const reference = references[item.index]
             const physical = reference.userData.object.physical
+
+            // Calculate new position centered along the original baseline
+            const pos = center.clone().addScaledVector(dir, item.offset * spacing)
+
+            // Morph U into J by collapsing the left vertical stem
+            if (item.isJ) {
+                const geometry = reference.geometry
+                const position = geometry.attributes.position
+                if (position) {
+                    const array = position.array
+                    const count = position.count
+                    for (let i = 0; i < count; i++) {
+                        const x = array[i * 3 + 0]
+                        const y = array[i * 3 + 1]
+                        
+                        // In U's local coordinates, the left stem is in negative X (x < -0.1) and above the curve (y > -0.2)
+                        if (x < -0.1 && y > -0.2) {
+                            // Collapse all left stem vertices to the top-left curve start
+                            array[i * 3 + 0] = -0.1
+                            array[i * 3 + 1] = -0.2
+                        }
+                    }
+                    position.needsUpdate = true
+                    geometry.computeVertexNormals()
+                    geometry.computeBoundingBox()
+                    geometry.computeBoundingSphere()
+                }
+            }
+
+            // Move the Rapier physics body
+            physical.body.setTranslation({ x: pos.x, y: pos.y, z: pos.z }, true)
+            reference.position.copy(pos)
+
+            // Save new initial state so resets/restarts return the letters here
+            physical.initialState.position = { x: pos.x, y: pos.y, z: pos.z }
+
+            // Configure contact events and collision sounds
             physical.colliders[0].setActiveEvents(this.game.RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
             physical.colliders[0].setContactForceEventThreshold(5)
             physical.onCollision = (force, position) =>
             {
                 this.game.audio.groups.get('hitBrick').playRandomNext(force, position)
+            }
+        }
+
+        // 4. Disable and hide all unused letter meshes and physics bodies
+        for (let i = 0; i < references.length; i++) {
+            if (!targetLetters.some(item => item.index === i)) {
+                this.game.objects.disable(references[i].userData.object)
             }
         }
     }
