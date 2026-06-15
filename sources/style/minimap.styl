@@ -1,0 +1,154 @@
+// ──────────────────────────────────────────────────────────
+//  Minimap HUD  ·  bottom-right corner, always visible
+// ──────────────────────────────────────────────────────────
+
+$minimap-size = 160px
+$minimap-size-sm = 120px
+$minimap-size-xs = 100px
+
+// Only show once the experience has started
+.minimap-hud
+    display none
+    position absolute
+    bottom 16px
+    right 16px
+    width $minimap-size
+    height $minimap-size
+    z-index 8
+    pointer-events none
+    user-select none
+
+    // Slide in after game starts
+    html.is-started &
+        display block
+
+    // Hide during menus / modals / cinematic / intro
+    html.input-filter-menu &
+    html.input-filter-modal &
+    html.input-filter-cinematic &
+    html.input-filter-intro &
+        opacity 0
+        pointer-events none
+
+    @media only screen and (max-width 520px)
+        width $minimap-size-sm
+        height $minimap-size-sm
+        bottom 12px
+        right 12px
+
+    @media only screen and (max-width 360px)
+        width $minimap-size-xs
+        height $minimap-size-xs
+        bottom 8px
+        right 8px
+
+// ── Inner wrapper (clips the map texture into a circle) ────
+.minimap-hud__inner
+    position relative
+    width 100%
+    height 100%
+    border-radius 50%
+    overflow hidden
+
+    // Subtle drop-shadow so it reads against any background
+    filter drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7))
+
+// ── Map texture ───────────────────────────────────────────
+.minimap-hud__texture
+    display block
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    border-radius 50%
+    object-fit cover
+    pointer-events none
+    opacity 0
+    transition opacity 0.4s
+
+    &.is-visible
+        opacity 1
+
+// ── Car / player marker ───────────────────────────────────
+.minimap-hud__player
+    position absolute
+    top 0
+    left 0
+    width 0
+    height 0
+    pointer-events none
+    z-index 3
+
+    // Arrow triangle pointing "up" = car forward direction
+    &::after
+        content ''
+        position absolute
+        width 0
+        height 0
+        // Draw a sharp upward-pointing triangle
+        border-left   5px solid transparent
+        border-right  5px solid transparent
+        border-bottom 12px solid #ff3333
+        // Centre on the marker point
+        transform translate(-50%, -100%)
+        filter drop-shadow(0 0 4px rgba(255, 50, 50, 0.8))
+
+    // Pulsing halo ring around the car
+    &::before
+        content ''
+        position absolute
+        width 14px
+        height 14px
+        border-radius 50%
+        background rgba(255, 50, 50, 0.35)
+        border 1.5px solid rgba(255, 80, 80, 0.7)
+        transform translate(-50%, -50%)
+        animation minimap-pulse 2s ease-in-out infinite
+
+@keyframes minimap-pulse
+    0%, 100%
+        transform translate(-50%, -50%) scale(1)
+        opacity 0.8
+    50%
+        transform translate(-50%, -50%) scale(1.5)
+        opacity 0.2
+
+// ── Decorative frame ring ─────────────────────────────────
+.minimap-hud__frame
+    position absolute
+    inset 0
+    border-radius 50%
+    border 2px solid rgba(255, 255, 255, 0.35)
+    box-shadow inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+               0 0 0 1px rgba(0, 0, 0, 0.5)
+    pointer-events none
+    z-index 4
+
+    // Subtle gloss highlight at the top
+    &::before
+        content ''
+        position absolute
+        top 4%
+        left 15%
+        width 70%
+        height 30%
+        border-radius 50%
+        background linear-gradient(to bottom, rgba(255,255,255,0.12), transparent)
+        pointer-events none
+
+// ── "MAP" label ───────────────────────────────────────────
+.minimap-hud__label
+    position absolute
+    bottom 8px
+    left 50%
+    transform translateX(-50%)
+    font-family "Nunito", sans-serif
+    font-size 8px
+    font-weight 900
+    letter-spacing 2px
+    text-transform uppercase
+    color rgba(255, 255, 255, 0.6)
+    pointer-events none
+    z-index 5
+    text-shadow 0 1px 3px rgba(0,0,0,0.8)
