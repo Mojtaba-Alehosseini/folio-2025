@@ -34,15 +34,19 @@ export class LandingArea extends Area
         const dir = new THREE.Vector3().subVectors(pos_9, pos_0).normalize()
         
         // 2. Define the letter layout for "MOJI"
-        // Original index mappings: 7 = M, 4 = O, 2 = U (to be morphed into J), 6 = I
+        // Correct index mappings determined from bounding-box width analysis of areas.glb:
+        //   index 2 → width 1.490 = M (widest)
+        //   index 1 → width 1.433, height 1.512 = O (tall round, two identical at 1 & 5)
+        //   index 6 → confirmed U shape in-game (screenshot)
+        //   index 3 → width 0.364 = I (uniquely narrow)
         const targetLetters = [
-            { index: 7, offset: -1.35 }, // M
-            { index: 4, offset: -0.45 }, // O
-            { index: 2, offset: 0.45, isJ: true },  // J (morphed from U)
-            { index: 6, offset: 1.25 }  // I
+            { index: 2, offset:  1.55 }, // M  (widest — camera LEFT, first letter of MOJI)
+            { index: 1, offset:  0.35 }, // O
+            { index: 6, offset: -0.60, isJ: true }, // J (morphed from U)
+            { index: 3, offset: -1.40 }  // I  (narrowest — camera RIGHT, last letter of MOJI)
         ]
 
-        const spacing = 1.35
+        const spacing = 1.4
 
         // 3. Position and morph the letters we want to keep
         for (const item of targetLetters) {
@@ -52,28 +56,40 @@ export class LandingArea extends Area
             // Calculate new position centered along the original baseline
             const pos = center.clone().addScaledVector(dir, item.offset * spacing)
 
-            // Morph U into J by collapsing the left vertical stem
+            // Morph U into J:
+            // U vertex layout: 4 Y rows: -0.724 (bottom), -0.137, +0.137, +0.724 (top)
+            //                  X columns: -0.619 (left outer), -0.255 (left inner),
+            //                             +0.255 (right inner), +0.619 (right outer)
+            //
+            // Strategy: push left-side vertices (x < 0) DOWNWARD to y = -0.7237
+            //   • y = -0.7237 row  (x < 0, threshold -0.7237 > -0.7 is FALSE) → KEPT
+            //     → the bottom bridge / J hook remains intact on the left
+            //   • y = -0.137, +0.137, +0.724 rows (x < 0) → COLLAPSED to y = -0.7237
+            //     → the left column folds flat (degenerate faces) and vanishes
+            //   • All right-side vertices (x > 0) are untouched → right stem stays full height
+            // Result: J shape — tall right stem + flat bottom hook extending left.
             if (item.isJ) {
-                const geometry = reference.geometry
-                const position = geometry.attributes.position
-                if (position) {
-                    const array = position.array
-                    const count = position.count
-                    for (let i = 0; i < count; i++) {
-                        const x = array[i * 3 + 0]
-                        const y = array[i * 3 + 1]
-                        
-                        // In U's local coordinates, the left stem is in negative X (x < -0.1) and above the curve (y > -0.2)
-                        if (x < -0.1 && y > -0.2) {
-                            // Collapse all left stem vertices to the top-left curve start
-                            array[i * 3 + 0] = -0.1
-                            array[i * 3 + 1] = -0.2
+                try {
+                    // Clone geometry so we don't mutate a shared GLB buffer
+                    const cloned = reference.geometry.clone()
+                    reference.geometry = cloned
+
+                    const posAttr = cloned.attributes.position
+                    const mutable = new Float32Array(posAttr.array)
+                    const BOTTOM_Y = -0.7237
+                    for (let i = 0; i < posAttr.count; i++) {
+                        const x = mutable[i * 3]
+                        // Collapse everything to the left of the right stem (x < 0.255) to the bottom
+                        if (x < 0.255) {
+                            mutable[i * 3 + 1] = BOTTOM_Y
                         }
                     }
-                    position.needsUpdate = true
-                    geometry.computeVertexNormals()
-                    geometry.computeBoundingBox()
-                    geometry.computeBoundingSphere()
+                    cloned.setAttribute('position', new THREE.BufferAttribute(mutable, 3))
+                    cloned.computeVertexNormals()
+                    cloned.computeBoundingBox()
+                    cloned.computeBoundingSphere()
+                } catch(e) {
+                    console.warn('J morph failed, using U shape:', e)
                 }
             }
 
