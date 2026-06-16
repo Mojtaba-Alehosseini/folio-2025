@@ -4,10 +4,8 @@ import { Game } from './Game.js'
 /**
  * MinimapHUD – a small always-visible radar in the bottom-right corner.
  *
- * It reuses the same map images (map-day.webp / map-night.webp) and the
- * same worldToMap coordinate conversion as the full-screen Map.js, but
- * renders as a compact HUD element that is permanently shown while the
- * player is driving.
+ * Reuses the same map-day / map-night images as the full-screen Map
+ * modal but renders as a permanent HUD element while the player drives.
  */
 export class MinimapHUD
 {
@@ -20,80 +18,86 @@ export class MinimapHUD
         this.playerElement  = this.element.querySelector('.js-minimap-player')
 
         // Track previous values to avoid unnecessary style writes
-        this.previousTextureUrl  = null
-        this.previousRoundedX    = null
-        this.previousRoundedZ    = null
+        this.previousTextureUrl = null
+        this.previousRoundedX   = null
+        this.previousRoundedZ   = null
+        this.previousNightState = null   // last known inInterval value
 
-        this.setTexture()
-
-        // Update on every tick (runs after physics, priority 15)
-        this.game.ticker.events.on('tick', () =>
-        {
-            this.update()
-        }, 15)
-
-        // Swap day/night texture whenever the day cycle ticks
-        this.game.dayCycles.intervalEvents.get('night').events.on('change', () =>
-        {
-            this.updateTexture()
-        })
-    }
-
-    // ------------------------------------------------------------------
-
-    setTexture()
-    {
+        // Wire up the texture load fade-in
         this.textureElement.addEventListener('load', () =>
         {
             this.textureElement.classList.add('is-visible')
         })
 
-        this.updateTexture()
+        // Start with the day map; update() will switch when night arrives
+        this._setTexture('ui/map/map-day.webp')
+
+        // Runs every tick after physics (priority 15)
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        }, 15)
     }
 
-    updateTexture()
-    {
-        const url = this.game.dayCycles.intervalEvents.get('night').inInterval
-            ? 'ui/map/map-night.webp'
-            : 'ui/map/map-day.webp'
+    // ─────────────────────────────────────────────────────────────────
 
-        if (url !== this.previousTextureUrl)
+    _setTexture(url)
+    {
+        if (url === this.previousTextureUrl) return
+        this.textureElement.classList.remove('is-visible')
+        this.previousTextureUrl = url
+        this.textureElement.src = url
+    }
+
+    _isNight()
+    {
+        try
         {
-            this.textureElement.classList.remove('is-visible')
-            this.previousTextureUrl = url
-            this.textureElement.src = url
+            const nightInterval = this.game.dayCycles.intervalEvents.get('night')
+            return nightInterval ? nightInterval.inInterval : false
+        }
+        catch (e)
+        {
+            return false
         }
     }
 
-    // ------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────
 
     worldToMap(x, z)
     {
-        let mx = x / this.game.terrain.size + 0.5
-        let my = z / this.game.terrain.size + 0.5
-        mx = clamp(mx, 0, 1)
-        my = clamp(my, 0, 1)
+        const size = this.game.terrain.size
+        let mx = clamp(x / size + 0.5, 0, 1)
+        let my = clamp(z / size + 0.5, 0, 1)
         return { x: mx, y: my }
     }
 
-    // ------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────
 
     update()
     {
+        // ── Texture day/night swap (polled, no event dependency) ──────
+        const isNight = this._isNight()
+        if (isNight !== this.previousNightState)
+        {
+            this.previousNightState = isNight
+            this._setTexture(isNight ? 'ui/map/map-night.webp' : 'ui/map/map-day.webp')
+        }
+
+        // ── Player marker ─────────────────────────────────────────────
         const px = Math.round(this.game.player.position.x)
         const pz = Math.round(this.game.player.position.z)
 
-        if (px === this.previousRoundedX && pz === this.previousRoundedZ)
-            return
+        if (px === this.previousRoundedX && pz === this.previousRoundedZ) return
 
         this.previousRoundedX = px
         this.previousRoundedZ = pz
 
         const mapPos = this.worldToMap(px, pz)
 
-        // Position the player dot
         this.playerElement.style.left      = `${mapPos.x * 100}%`
         this.playerElement.style.top       = `${mapPos.y * 100}%`
-        this.playerElement.style.transform = `translate(-50%, -50%) rotate(${-this.game.physicalVehicle.yRotation}rad)`
+        this.playerElement.style.transform =
+            `translate(-50%, -50%) rotate(${-this.game.physicalVehicle.yRotation}rad)`
     }
 }
