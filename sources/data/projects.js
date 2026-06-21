@@ -6,7 +6,8 @@ export default [
         attributes:
         {
             role: [ 'computer vision', 'interactive UI' ],
-            with: 'Python'
+            at: 'Open Source',
+            with: 'Python · MediaPipe'
         },
         distinctions: [],
         images:
@@ -19,37 +20,21 @@ export default [
         ]
     },
     {
-        title: 'Change Detection Blob Matching',
-        titleSmall: [ 'Blob', 'Matching' ],
-        url: 'https://github.com/Mojtaba-Alehosseini/Change-Detection-Blob-Matching',
+        title: 'Pneumonia X-ray Classifier',
+        titleSmall: [ 'X-ray', 'Classifier' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/Pneumonia_X_ray_transfer_learning',
         attributes:
         {
-            role: [ 'computer vision', 'tracking' ],
-            with: 'OpenCV'
+            role: [ 'deep learning', 'medical imaging' ],
+            at: 'UniGe · AI track',
+            with: 'PyTorch · ResNet'
         },
         distinctions: [],
         images:
         [
-            'bonhomme-10-ans-1.ktx',
-            'bonhomme-10-ans-2.ktx',
-            'bonhomme-10-ans-3.ktx',
-        ]
-    },
-    {
-        title: 'Marketplace Optimisation',
-        titleSmall: [ 'Marketplace', 'Optimisation' ],
-        url: 'https://github.com/Mojtaba-Alehosseini/marketplace-optimisation',
-        attributes:
-        {
-            role: [ 'optimization', 'analytics' ],
-            with: 'Python'
-        },
-        distinctions: [],
-        images:
-        [
-            'madbox-1.ktx',
-            'madbox-2.ktx',
-            'madbox-3.ktx',
+            'prior-1.ktx',
+            'prior-2.ktx',
+            'prior-3.ktx',
         ]
     },
     {
@@ -59,7 +44,8 @@ export default [
         attributes:
         {
             role: [ 'dashboard', 'cost analysis' ],
-            with: 'Power BI'
+            at: 'Professional',
+            with: 'Power BI · DAX'
         },
         distinctions: [],
         images:
@@ -77,7 +63,8 @@ export default [
         attributes:
         {
             role: [ 'machine learning', 'delivery' ],
-            with: 'Python'
+            at: 'Open Source',
+            with: 'Python · Docker'
         },
         distinctions: [],
         images:
@@ -88,20 +75,40 @@ export default [
         ]
     },
     {
-        title: 'Pneumonia X-ray Transfer Learning',
-        titleSmall: [ 'X-ray', 'Transfer' ],
-        url: 'https://github.com/Mojtaba-Alehosseini/Pneumonia_X_ray_transfer_learning',
+        title: 'Change Detection Blob Matching',
+        titleSmall: [ 'Blob', 'Matching' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/Change-Detection-Blob-Matching',
         attributes:
         {
-            role: [ 'deep learning', 'medical imaging' ],
-            with: 'PyTorch'
+            role: [ 'computer vision', 'tracking' ],
+            at: 'UniGe · AI track',
+            with: 'OpenCV · Python'
         },
         distinctions: [],
         images:
         [
-            'prior-1.ktx',
-            'prior-2.ktx',
-            'prior-3.ktx',
+            'bonhomme-10-ans-1.ktx',
+            'bonhomme-10-ans-2.ktx',
+            'bonhomme-10-ans-3.ktx',
+            'bonhomme-10-ans-4.ktx',
+        ]
+    },
+    {
+        title: 'Marketplace Optimisation',
+        titleSmall: [ 'Marketplace', 'Optimisation' ],
+        url: 'https://github.com/Mojtaba-Alehosseini/marketplace-optimisation',
+        attributes:
+        {
+            role: [ 'optimization', 'analytics' ],
+            at: 'Professional',
+            with: 'Python · Pandas'
+        },
+        distinctions: [],
+        images:
+        [
+            'chartogne-taillet-1.ktx',
+            'chartogne-taillet-2.ktx',
+            'chartogne-taillet-3.ktx',
         ]
     },
     {
@@ -111,7 +118,8 @@ export default [
         attributes:
         {
             role: [ 'optimization', 'algorithms' ],
-            with: 'Python'
+            at: 'UniGe · AI track',
+            with: 'Python · NumPy'
         },
         distinctions: [],
         images:
@@ -128,7 +136,8 @@ export default [
         attributes:
         {
             role: [ 'simulation', 'operations research' ],
-            with: 'Python'
+            at: 'UniGe · AI track',
+            with: 'Python · SimPy'
         },
         distinctions: [],
         images:

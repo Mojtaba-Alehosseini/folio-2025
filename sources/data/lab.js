@@ -59,22 +59,4 @@ export default [
         image: 'vfx-tornado.ktx',
         imageMini: 'vfx-tornado-mini.ktx'
     },
-    {
-        title: 'Dump Truck Problem',
-        url: 'https://github.com/Mojtaba-Alehosseini/The-Dump-Truck-Problem',
-        image: 'doom-portal.ktx',
-        imageMini: 'doom-portal-mini.ktx'
-    },
-    {
-        title: 'Genetic Algorithm',
-        url: 'https://github.com/Mojtaba-Alehosseini/Genetic-Algorithm',
-        image: 'organic-sphere.ktx',
-        imageMini: 'organic-sphere-mini.ktx'
-    },
-    {
-        title: 'Marketplace Optimisation',
-        url: 'https://github.com/Mojtaba-Alehosseini/marketplace-optimisation',
-        image: 'attractors.ktx',
-        imageMini: 'attractors-mini.ktx'
-    }
 ]

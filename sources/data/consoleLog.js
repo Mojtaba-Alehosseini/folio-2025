@@ -28,8 +28,9 @@ Three.js renders this 3D world (release: ${THREE.REVISION})
 https://threejs.org/
 
 Source code
-Original project => https://github.com/brunosimon/folio-2025
-Personal site    => https://github.com/Mojtaba-Alehosseini
+Original project  => https://github.com/brunosimon/folio-2025
+This folio        => https://github.com/Mojtaba-Alehosseini/folio-2025
+Personal site     => https://mojtaba-alehosseini.github.io/
 
 Audio
 The music included with the original portfolio was made by Kounine and released under CC0.
