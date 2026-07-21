@@ -9,6 +9,34 @@ export class Respawns
         this.defaultName = defaultName
 
         this.setItems()
+        this.applyUrlOverride()
+    }
+
+    /**
+     * Let a link land somewhere other than the landing area, so the projects
+     * or career areas can be linked to directly from a CV or a profile:
+     *
+     *   mojtaba-alehosseini.github.io/folio-2025/?area=projects
+     *
+     * An unknown name falls back to the default rather than dropping the
+     * visitor into nothing.
+     */
+    applyUrlOverride()
+    {
+        if(typeof window === 'undefined')
+            return
+
+        const requested = new URLSearchParams(window.location.search).get('area')
+
+        if(!requested)
+            return
+
+        const name = requested.charAt(0).toLowerCase() + requested.slice(1)
+
+        if(this.items.has(name))
+            this.defaultName = name
+        else
+            console.warn(`Respawns > no area named "${requested}", starting at "${this.defaultName}" instead`)
     }
 
     setItems()

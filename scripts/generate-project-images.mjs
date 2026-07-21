@@ -549,6 +549,53 @@ async function render(project, faceIndex, total)
     return image.png({ compressionLevel: 9 }).toBuffer()
 }
 
+/**
+ * The 1200x630 card link previews use.
+ *
+ * The upstream repo shipped one with "Bruno's" set across the top. The render
+ * underneath is the same world this fork serves, so it is reframed rather than
+ * replaced: scaled up and cropped past the old wordmark, then given a scrim
+ * and this site's own title.
+ */
+async function shareCard()
+{
+    const SW = 1200
+    const SH = 630
+
+    const scene = await sharp(path.join(PHOTO_DIR, 'world-render.png'))
+        .resize(1920, 1008)
+        .extract({ left: 700, top: 300, width: SW, height: SH })
+        .toBuffer()
+
+    const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}">
+        <defs>
+            <linearGradient id="scrim" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="${PALETTE.ink}" stop-opacity="0.95"/>
+                <stop offset="45%" stop-color="${PALETTE.ink}" stop-opacity="0.78"/>
+                <stop offset="100%" stop-color="${PALETTE.ink}" stop-opacity="0"/>
+            </linearGradient>
+        </defs>
+        <rect x="0" y="${SH * 0.28}" width="${SW}" height="${SH * 0.72}" fill="url(#scrim)"/>
+        <rect x="0" y="${SH - 8}" width="${SW}" height="8" fill="${PALETTE.ember}"/>
+        ${text(fonts.bold, "Mojtaba's", { x: 72, y: SH - 138, size: 104, fill: PALETTE.paper })}
+        ${text(fonts.medium, 'AI, computer vision and analytics — as a place you can drive through', {
+            x: 76, y: SH - 86, size: 30, fill: PALETTE.paper, opacity: 0.78
+        })}
+        ${text(fonts.medium, 'MOJTABA-ALEHOSSEINI.GITHUB.IO', {
+            x: 76, y: SH - 40, size: 21, fill: PALETTE.ember, tracking: 3
+        })}
+    </svg>`
+
+    const out = path.join(ROOT, 'static/social/share-image.png')
+    await fs.mkdir(path.dirname(out), { recursive: true })
+    await sharp(scene)
+        .composite([ { input: Buffer.from(overlay), top: 0, left: 0 } ])
+        .png({ compressionLevel: 9 })
+        .toFile(out)
+
+    console.log('  social/share-image.png  1200x630')
+}
+
 async function main()
 {
     const pngFlag = process.argv.indexOf('--png')
@@ -582,6 +629,8 @@ async function main()
             console.log(`  ${name}.ktx  ${(ktx.byteLength / 1024).toFixed(1)} KB`)
         }
     }
+
+    await shareCard()
 }
 
 await main()
