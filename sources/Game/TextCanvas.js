@@ -15,7 +15,10 @@ export class TextCanvas
     )
     {
         this.lines = []
-        this.font = `${fontWeight} ${fontSize * density}px "${fontFamily}"`
+        this.fontFamily = fontFamily
+        this.fontWeight = fontWeight
+        this.fontSizePx = fontSize * density
+        this.font = `${fontWeight} ${this.fontSizePx}px "${fontFamily}"`
         this.width = Math.ceil(width * density)
         this.height = Math.ceil(height * density)
         this.horizontalAlign = horizontalAlign
@@ -79,8 +82,33 @@ export class TextCanvas
         return output
     }
 
+    /**
+     * Shrink the font until the longest line fits. Without this, anything
+     * wider than the canvas is silently cropped mid-glyph — which is what the
+     * longer repository URLs used to do.
+     */
+    fitFont()
+    {
+        this.context.font = this.font
+
+        let widest = 0
+
+        for(const line of this.lines)
+            widest = Math.max(widest, this.context.measureText(line).width)
+
+        const usable = this.width * 0.98
+
+        if(widest > usable && widest > 0)
+        {
+            const size = Math.max(1, Math.floor(this.fontSizePx * (usable / widest)))
+            this.context.font = `${this.fontWeight} ${size}px "${this.fontFamily}"`
+        }
+    }
+
     draw()
     {
+        this.fitFont()
+
         // Clear
         this.context.fillStyle = '#000000'
         this.context.fillRect(0, 0, this.width, this.height)

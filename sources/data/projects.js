@@ -1,3 +1,8 @@
+/**
+ * Drives the projects area. Titles, stacks and image keys are kept in step
+ * with scripts/projects-data.mjs, which generates the artwork these entries
+ * point at — change one, regenerate the other.
+ */
 export default [
     {
         title: 'Hand Frame Effects',
@@ -6,17 +11,15 @@ export default [
         attributes:
         {
             role: [ 'computer vision', 'interactive UI' ],
-            at: 'Open Source',
-            with: 'Python · MediaPipe'
+            at: 'Personal',
+            with: [ 'JavaScript', 'MediaPipe' ]
         },
         distinctions: [],
         images:
         [
-            'threejs-journey-1.ktx',
-            'threejs-journey-2.ktx',
-            'threejs-journey-3.ktx',
-            'threejs-journey-4.ktx',
-            'threejs-journey-5.ktx',
+            'hand-frame-1.ktx',
+            'hand-frame-2.ktx',
+            'hand-frame-3.ktx'
         ]
     },
     {
@@ -26,34 +29,33 @@ export default [
         attributes:
         {
             role: [ 'deep learning', 'medical imaging' ],
-            at: 'UniGe · AI track',
-            with: 'PyTorch · ResNet'
+            at: 'Coursework',
+            with: [ 'TensorFlow', 'Keras' ]
         },
         distinctions: [],
         images:
         [
-            'prior-1.ktx',
-            'prior-2.ktx',
-            'prior-3.ktx',
+            'pneumonia-xray-1.ktx',
+            'pneumonia-xray-2.ktx',
+            'pneumonia-xray-3.ktx'
         ]
     },
     {
-        title: 'GPU Cost Energy Dashboard',
-        titleSmall: [ 'GPU Cost', 'Dashboard' ],
+        title: 'GPU Cost & Energy',
+        titleSmall: [ 'GPU Cost', '& Energy' ],
         url: 'https://github.com/Mojtaba-Alehosseini/gpu-cost-energy-dashboard',
         attributes:
         {
-            role: [ 'dashboard', 'cost analysis' ],
-            at: 'Professional',
-            with: 'Power BI · DAX'
+            role: [ 'observability', 'cost analysis' ],
+            at: 'Personal',
+            with: [ 'Prometheus', 'Grafana' ]
         },
         distinctions: [],
         images:
         [
-            'luni-1.ktx',
-            'luni-2.ktx',
-            'luni-3.ktx',
-            'luni-4.ktx',
+            'gpu-energy-1.ktx',
+            'gpu-energy-2.ktx',
+            'gpu-energy-3.ktx'
         ]
     },
     {
@@ -62,35 +64,34 @@ export default [
         url: 'https://github.com/Mojtaba-Alehosseini/mlops-pipeline',
         attributes:
         {
-            role: [ 'machine learning', 'delivery' ],
-            at: 'Open Source',
-            with: 'Python · Docker'
+            role: [ 'machine learning', 'CI/CD' ],
+            at: 'Personal',
+            with: [ 'DVC', 'MLflow' ]
         },
         distinctions: [],
         images:
         [
-            'scout-1.ktx',
-            'scout-2.ktx',
-            'scout-3.ktx',
+            'mlops-pipeline-1.ktx',
+            'mlops-pipeline-2.ktx',
+            'mlops-pipeline-3.ktx'
         ]
     },
     {
-        title: 'Change Detection Blob Matching',
-        titleSmall: [ 'Blob', 'Matching' ],
+        title: 'Change Detection',
+        titleSmall: [ 'Change', 'Detection' ],
         url: 'https://github.com/Mojtaba-Alehosseini/Change-Detection-Blob-Matching',
         attributes:
         {
             role: [ 'computer vision', 'tracking' ],
-            at: 'UniGe · AI track',
-            with: 'OpenCV · Python'
+            at: 'Coursework',
+            with: [ 'OpenCV', 'Python' ]
         },
         distinctions: [],
         images:
         [
-            'bonhomme-10-ans-1.ktx',
-            'bonhomme-10-ans-2.ktx',
-            'bonhomme-10-ans-3.ktx',
-            'bonhomme-10-ans-4.ktx',
+            'change-detection-1.ktx',
+            'change-detection-2.ktx',
+            'change-detection-3.ktx'
         ]
     },
     {
@@ -99,16 +100,16 @@ export default [
         url: 'https://github.com/Mojtaba-Alehosseini/marketplace-optimisation',
         attributes:
         {
-            role: [ 'optimization', 'analytics' ],
-            at: 'Professional',
-            with: 'Python · Pandas'
+            role: [ 'optimisation', 'analytics' ],
+            at: 'Personal',
+            with: [ 'Python', 'SciPy' ]
         },
         distinctions: [],
         images:
         [
-            'chartogne-taillet-1.ktx',
-            'chartogne-taillet-2.ktx',
-            'chartogne-taillet-3.ktx',
+            'marketplace-1.ktx',
+            'marketplace-2.ktx',
+            'marketplace-3.ktx'
         ]
     },
     {
@@ -117,16 +118,16 @@ export default [
         url: 'https://github.com/Mojtaba-Alehosseini/Genetic-Algorithm',
         attributes:
         {
-            role: [ 'optimization', 'algorithms' ],
-            at: 'UniGe · AI track',
-            with: 'Python · NumPy'
+            role: [ 'optimisation', 'algorithms' ],
+            at: 'Coursework',
+            with: [ 'MATLAB' ]
         },
         distinctions: [],
         images:
         [
-            'orano-1.ktx',
-            'orano-2.ktx',
-            'orano-3.ktx',
+            'genetic-algorithm-1.ktx',
+            'genetic-algorithm-2.ktx',
+            'genetic-algorithm-3.ktx'
         ]
     },
     {
@@ -135,16 +136,16 @@ export default [
         url: 'https://github.com/Mojtaba-Alehosseini/The-Dump-Truck-Problem',
         attributes:
         {
-            role: [ 'simulation', 'operations research' ],
-            at: 'UniGe · AI track',
-            with: 'Python · SimPy'
+            role: [ 'simulation', 'queueing' ],
+            at: 'Coursework',
+            with: [ 'FreeBASIC' ]
         },
         distinctions: [],
         images:
         [
-            'citrix-redbull-1.ktx',
-            'citrix-redbull-2.ktx',
-            'citrix-redbull-3.ktx',
+            'dump-truck-1.ktx',
+            'dump-truck-2.ktx',
+            'dump-truck-3.ktx'
         ]
     }
 ]
