@@ -5,9 +5,16 @@ import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 import gsap from 'gsap'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
+import { LetterJGeometry } from '../../Geometries/LetterJGeometry.js'
 
 export class LandingArea extends Area
 {
+    // The letters modelled in areas.glb, in reading order along the baseline
+    static SOURCE_LETTERS = 'BRUNOSIMON'
+
+    // Gap between the letters of the word the area actually spells
+    static LETTER_GAP = 0.28
+
     constructor(model)
     {
         super(model)
@@ -25,95 +32,118 @@ export class LandingArea extends Area
     {
         const references = this.references.items.get('letters')
 
-        if (!references || references.length < 10) return
+        if(!references || references.length < LandingArea.SOURCE_LETTERS.length)
+            return
 
-        // 1. Get original positions of first and last letters to compute center and direction
-        const pos_0 = references[0].position.clone()
-        const pos_9 = references[9].position.clone()
-        const center = new THREE.Vector3().addVectors(pos_0, pos_9).multiplyScalar(0.5)
-        const dir = new THREE.Vector3().subVectors(pos_9, pos_0).normalize()
-        
-        // 2. Define the letter layout for "MOJI"
-        // Correct index mappings determined from bounding-box width analysis of areas.glb:
-        //   index 2 → width 1.490 = M (widest)
-        //   index 1 → width 1.433, height 1.512 = O (tall round, two identical at 1 & 5)
-        //   index 6 → confirmed U shape in-game (screenshot)
-        //   index 3 → width 0.364 = I (uniquely narrow)
-        const targetLetters = [
-            { index: 2, offset:  1.55 }, // M  (widest — camera LEFT, first letter of MOJI)
-            { index: 1, offset:  0.35 }, // O
-            { index: 6, offset: -0.60, isJ: true }, // J (morphed from U)
-            { index: 3, offset: -1.40 }  // I  (narrowest — camera RIGHT, last letter of MOJI)
-        ]
+        // The letters baked into areas.glb spell "BRUNOSIMON". Sorting them
+        // along the baseline recovers reading order, which stays correct even
+        // if the GLB is re-exported with a different node order.
+        const sorted = [ ...references ].sort((a, b) => a.position.x - b.position.x)
 
-        const spacing = 1.4
+        const pick = (character, occurrence = 0) =>
+        {
+            let seen = 0
 
-        // 3. Position and morph the letters we want to keep
-        for (const item of targetLetters) {
-            const reference = references[item.index]
-            const physical = reference.userData.object.physical
+            for(let i = 0; i < LandingArea.SOURCE_LETTERS.length; i++)
+            {
+                if(LandingArea.SOURCE_LETTERS[i] !== character)
+                    continue
 
-            // Calculate new position centered along the original baseline
-            const pos = center.clone().addScaledVector(dir, item.offset * spacing)
+                if(seen === occurrence)
+                    return sorted[i]
 
-            // Morph U into J:
-            // U vertex layout: 4 Y rows: -0.724 (bottom), -0.137, +0.137, +0.724 (top)
-            //                  X columns: -0.619 (left outer), -0.255 (left inner),
-            //                             +0.255 (right inner), +0.619 (right outer)
-            //
-            // Strategy: push left-side vertices (x < 0) DOWNWARD to y = -0.7237
-            //   • y = -0.7237 row  (x < 0, threshold -0.7237 > -0.7 is FALSE) → KEPT
-            //     → the bottom bridge / J hook remains intact on the left
-            //   • y = -0.137, +0.137, +0.724 rows (x < 0) → COLLAPSED to y = -0.7237
-            //     → the left column folds flat (degenerate faces) and vanishes
-            //   • All right-side vertices (x > 0) are untouched → right stem stays full height
-            // Result: J shape — tall right stem + flat bottom hook extending left.
-            if (item.isJ) {
-                try {
-                    // Clone geometry so we don't mutate a shared GLB buffer
-                    const cloned = reference.geometry.clone()
-                    reference.geometry = cloned
-
-                    const posAttr = cloned.attributes.position
-                    const mutable = new Float32Array(posAttr.array)
-                    const BOTTOM_Y = -0.7237
-                    for (let i = 0; i < posAttr.count; i++) {
-                        const x = mutable[i * 3]
-                        // Collapse everything to the left of the right stem (x < 0.255) to the bottom
-                        if (x < 0.255) {
-                            mutable[i * 3 + 1] = BOTTOM_Y
-                        }
-                    }
-                    cloned.setAttribute('position', new THREE.BufferAttribute(mutable, 3))
-                    cloned.computeVertexNormals()
-                    cloned.computeBoundingBox()
-                    cloned.computeBoundingSphere()
-                } catch(e) {
-                    console.warn('J morph failed, using U shape:', e)
-                }
+                seen++
             }
 
-            // Move the Rapier physics body
-            physical.body.setTranslation({ x: pos.x, y: pos.y, z: pos.z }, true)
-            reference.position.copy(pos)
+            return null
+        }
 
-            // Save new initial state so resets/restarts return the letters here
-            physical.initialState.position = { x: pos.x, y: pos.y, z: pos.z }
+        const widthOf = (reference) =>
+        {
+            if(!reference.geometry.boundingBox)
+                reference.geometry.computeBoundingBox()
 
-            // Configure contact events and collision sounds
-            physical.colliders[0].setActiveEvents(this.game.RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
-            physical.colliders[0].setContactForceEventThreshold(5)
+            const box = reference.geometry.boundingBox
+
+            return box.max.x - box.min.x
+        }
+
+        // "MOJI" — M, O and I are reused as-is; there is no J in "BRUNOSIMON",
+        // so the spare U donates its mesh and physics body to a generated one.
+        const letterM = pick('M')
+        const letterO = pick('O')
+        const letterI = pick('I')
+        const letterJ = pick('U')
+
+        if(!letterM || !letterO || !letterI || !letterJ)
+        {
+            console.warn('LandingArea: could not resolve the letters for "MOJI"')
+            return
+        }
+
+        letterJ.geometry = new LetterJGeometry()
+
+        const layout = [
+            { reference: letterM, width: widthOf(letterM) },
+            { reference: letterO, width: widthOf(letterO) },
+            { reference: letterJ, width: LetterJGeometry.WIDTH },
+            { reference: letterI, width: widthOf(letterI) }
+        ]
+
+        // Space the letters by their real widths so the gaps read evenly,
+        // then centre the word on the baseline the original one occupied.
+        const span =
+            layout.reduce((total, item) => total + item.width, 0) +
+            LandingArea.LETTER_GAP * (layout.length - 1)
+
+        const first = sorted[0].position
+        const last = sorted[sorted.length - 1].position
+        const center = new THREE.Vector3().addVectors(first, last).multiplyScalar(0.5)
+        const direction = new THREE.Vector3().subVectors(last, first).normalize()
+
+        let cursor = - span * 0.5
+
+        for(const item of layout)
+        {
+            const offset = cursor + item.width * 0.5
+            cursor += item.width + LandingArea.LETTER_GAP
+
+            const reference = item.reference
+            const physical = reference.userData.object.physical
+            const position = center.clone().addScaledVector(direction, offset)
+
+            reference.position.copy(position)
+            physical.body.setTranslation(position, true)
+
+            // Reset and respawn should bring the letters back here, not to
+            // wherever "BRUNO SIMON" used to stand
+            physical.initialState.position = { x: position.x, y: position.y, z: position.z }
+
+            const collider = physical.colliders[0]
+
+            // Keep the box collider in step with the letter it now represents
+            if(typeof collider.setHalfExtents === 'function')
+            {
+                const halfExtents = collider.halfExtents()
+
+                if(halfExtents)
+                    collider.setHalfExtents({ ...halfExtents, x: item.width * 0.5 })
+            }
+
+            collider.setActiveEvents(this.game.RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
+            collider.setContactForceEventThreshold(5)
+
             physical.onCollision = (force, position) =>
             {
                 this.game.audio.groups.get('hitBrick').playRandomNext(force, position)
             }
         }
 
-        // 4. Disable and hide all unused letter meshes and physics bodies
-        for (let i = 0; i < references.length; i++) {
-            if (!targetLetters.some(item => item.index === i)) {
-                this.game.objects.disable(references[i].userData.object)
-            }
+        // Retire every letter the new word does not use
+        for(const reference of references)
+        {
+            if(!layout.some(item => item.reference === reference))
+                this.game.objects.disable(reference.userData.object)
         }
     }
 
